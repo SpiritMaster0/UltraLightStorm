@@ -16,9 +16,10 @@ public class TargetCircleManager : MonoBehaviour
     public bool pausedGame = false;
     public bool tutorialShowUp = true;
     public TextMeshProUGUI tutorialText;
+    public AnimatedCircleBackground animatedCircleBackground;
     
     public List<string> tutorialTexts = new List<string>();
-    private int currentTextIndex = 0;
+    public int currentTextIndex = 0;
 
     void Awake()
     {
@@ -28,6 +29,10 @@ public class TargetCircleManager : MonoBehaviour
     void Start()
     {
         wormhole = FindObjectOfType<Wormhole>();
+        if (animatedCircleBackground == null)
+        {
+            animatedCircleBackground = FindObjectOfType<AnimatedCircleBackground>();
+        }
 
         targetCircleDataLists = new List<List<TargetCircleData>>();
         //JotaroTheme data list
@@ -37,7 +42,7 @@ public class TargetCircleManager : MonoBehaviour
         tutorialTexts.Add("Try moving your mouse around, you'll notice you have an Arrow following you around!");
         tutorialTexts.Add("This Arrow is how you play the game, you see that circle that just appeared?");
         tutorialTexts.Add("You have to move your mouse, and by extension, your arrow, through the Circle when the White Circle closes on it");
-        tutorialTexts.Add("There are also notes that will simply flash, with no White Circle Closing in. Try to react to them as soon as possible!");
+        tutorialTexts.Add("You may also notice there are arrows on the circles. You need to go through the circles in that direction.");
         tutorialTexts.Add("Depending on how fast you react, you can get a 'Bad...', and 'Okay.', a 'Good!' and a 'Perfect!!!'");
         tutorialTexts.Add("Try to aim for 'Perfect!!!' as it the best. And see how high your score is!");
         tutorialTexts.Add("When your ready, just go through both of the notes! Blaze past them, making a long trail of Light! Bulldoze through the circles!");
@@ -115,51 +120,50 @@ public class TargetCircleManager : MonoBehaviour
         targetCircleDataLists.Add(new List<TargetCircleData>
         {
             new TargetCircleData(new Vector2(0f, 2f), 90f, 0.3f, 23, 3f, 21, true),
-            new TargetCircleData(new Vector2(0f, 3f), 90f, 0.3f, 23, 3f, 21, false),
+            new TargetCircleData(new Vector2(0f, 3f), 90f, 0.3f, 23, 3f, 20, false),
             new TargetCircleData(new Vector2(4f, 0f), 320, 1f, 123, 3f, 78, true),
-            new TargetCircleData(new Vector2(0f, 0f), 135f, 6.3f, 23, 3f, 21, true),
+            new TargetCircleData(new Vector2(0f, 0f), 135f, 5.8f, 33, 3f, 31, true),
             new TargetCircleData(new Vector2(0f, 0f), 340f, 8.8f, 60, 3f, 55, true),
-            new TargetCircleData(new Vector2(6f, 0f), 90f, 11.4f, 23, 3f, 10, true),
+            new TargetCircleData(new Vector2(6f, 0f), 90f, 11f, 35, 3f, 22, true),
             new TargetCircleData(new Vector2(5f, -2f), 250f, 12f, 23, 3f, 21, true),
             new TargetCircleData(new Vector2(2.5f, 2f), 110f, 12f, 41, 3f, 40, true),
             new TargetCircleData(new Vector2(0f, -2f), 250f, 12f, 59, 3f, 58, true),
             new TargetCircleData(new Vector2(-2.5f, 2f), 110f, 12f, 77, 3f, 75, true),
-            new TargetCircleData(new Vector2(-5f, -2f), 70f, 16, 95, 3f, 94, true),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 16.65179f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 15.2555f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 15.90567f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 16.57904f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 16.997f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 18.06512f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 18.36698f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 19.38865f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 19.82983f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 20.45677f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 21.15338f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 22.05894f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 22.38402f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 23.10385f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 23.73079f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 24.40417f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 24.98467f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 25.35619f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 25.72771f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 26.35465f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 27.00479f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 27.37631f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 28.44444f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 28.9785f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 30.18594f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 30.83608f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 31.2076f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 31.53269f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 32.15963f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 32.87944f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 33.57604f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 34.17977f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 34.41196f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 34.85315f, 23, 3f, 10, false),
-            new TargetCircleData(new Vector2(0f, 0f), 0f, 35.50329f, 23, 3f, 10, false),
+            new TargetCircleData(new Vector2(-5f, -2f), 250f, 12f, 95, 3f, 94, true),
+        
+            new TargetCircleData(new Vector2(0f, 0f), 0f, 16f, 60, 3f, 30, true),
+            new TargetCircleData(new Vector2(0f, -3f), 200f, 17f, 38, 3f, 25, true),
+            new TargetCircleData(new Vector2(-3f, -1f), 100f, 17f, 53, 3f, 40, true),
+            new TargetCircleData(new Vector2(0f, 0f), 340f, 18.2f, 38, 3f, 25, true),
+            new TargetCircleData(new Vector2(3f, 2f), 80f, 18.2f, 53, 3f, 40, true),
+            new TargetCircleData(new Vector2(4f, 3f), 315f, 20f, 40, 3f, 30, true),
+            new TargetCircleData(new Vector2(0f, 1f), 135f, 21f, 40, 3f, 22, true),
+            new TargetCircleData(new Vector2(-4f, -1f), 270f, 21.67f, 30, 3f, 22, true),
+            new TargetCircleData(new Vector2(-4f, -2f), 270f, 21.67f, 30, 3f, 22, true),
+            new TargetCircleData(new Vector2(-4f, -3f), 270f, 21.67f, 30, 3f, 22, true),
+
+            new TargetCircleData(new Vector2(0f, -3f), 0f, 22.5f, 70, 3f, 21, true),
+            new TargetCircleData(new Vector2(0f, 0f), 180f, 22.5f, 70, 3f, 34, true),
+            new TargetCircleData(new Vector2(0f, 3f), 0f, 22, 80, 3f, 62, true),
+            new TargetCircleData(new Vector2(3f, -3f), 240f, 24, 40, 3f, 27, true),
+
+
+            new TargetCircleData(new Vector2(0f, 0f), 90f, 24.5f, 40, 3f, 30, true),
+            new TargetCircleData(new Vector2(3f, 3f), 0f, 25f, 40, 3f, 30, true),
+            new TargetCircleData(new Vector2(0f, 3f), 180f, 26f, 30, 3f, 21, true),
+            new TargetCircleData(new Vector2(-3f, 3f), 180f, 26f, 30, 3f, 21, false),
+            new TargetCircleData(new Vector2(-4f, 0f), 270f, 27f, 30, 3f, 21, true),
+
+            new TargetCircleData(new Vector2(0f, 0f), 45f, 27.5f, 30, 3f, 21, true),
+            new TargetCircleData(new Vector2(3f, 0f), 315f, 28f, 73, 3f, 52, true),
+            new TargetCircleData(new Vector2(5f, 0f), 90f, 29.8f, 73, 3f, 51, true),
+            new TargetCircleData(new Vector2(2f, 3f), 180f, 30.9f, 53, 3f, 42, true),
+            new TargetCircleData(new Vector2(-2f, 0f), 215f, 32f, 30, 3f, 21, true),
+            new TargetCircleData(new Vector2(-2f, 0f), 45f, 33.2f, 30, 3f, 21, true),
+            new TargetCircleData(new Vector2(0f, 3f), 0f, 34f, 30, 3f, 21, true),
+            new TargetCircleData(new Vector2(0f, 0f), 180f, 34.4f, 39, 3f, 21, true),
+            new TargetCircleData(new Vector2(0f, -3f), 0f, 34.85315f, 30, 3f, 21, true),
+            new TargetCircleData(new Vector2(3f, 0f), 90f, 35.50329f, 30, 3f, 21, true),
             new TargetCircleData(new Vector2(0f, 0f), 0f, 36.10702f, 23, 3f, 10, false),
             new TargetCircleData(new Vector2(0f, 0f), 0f, 36.87327f, 23, 3f, 10, false),
             new TargetCircleData(new Vector2(0f, 0f), 0f, 37.477f, 23, 3f, 10, false),
@@ -418,6 +422,18 @@ public class TargetCircleManager : MonoBehaviour
             SpawnCirclesForList(SongChoice);
             StartCoroutine(PauseGameWhenScoreIs500());
         }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            // Trigger the thrust pattern when 'T' key is pressed
+            animatedCircleBackground.TriggerThrustPattern();
+        }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            // Stop any active pattern when 'X' key is pressed
+            animatedCircleBackground.StopPattern();
+        }
     }
     private IEnumerator HandleTutorial()
     {
@@ -466,6 +482,14 @@ public class TargetCircleManager : MonoBehaviour
             tutorialText.gameObject.SetActive(false);
         }
     }
+
+    public void StopSpawningCircles()
+    {
+        StopAllCoroutines();
+        pausedGame = true;
+    }
+
+    
 
 void SpawnCirclesForList(int index)
 {

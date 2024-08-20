@@ -15,7 +15,7 @@ public class ScoreManager : MonoBehaviour
 
     public void AddScore(float points)
     {
-        score += points;
+        score += points * TargetCircle.Instance.scoreMultiplier;
         UpdateScoreText();
     }
 

@@ -25,10 +25,12 @@ public class TargetCircleData
 
 public class TargetCircle : MonoBehaviour
 {
+    public static TargetCircle Instance { get; private set; }
+    public GameObject scoreSplashEffectPrefab; 
     private int circleLifeSpan;
     private int maxLifeSpan;
     private float circleTransparency;
-    public float updateInterval = 1f / 30f; // Update coordinates every 1/30 seconds (30 FPS)
+    public float updateInterval = 1f / 30f; 
     private float timer;
     private SpriteRenderer spriteRenderer;
     public GameObject shrinkingCircle;
@@ -38,6 +40,7 @@ public class TargetCircle : MonoBehaviour
     public float scoreMultiplier;
     public bool isShrinkingWhiteCircle;
     private float targetCircleWhite = 0.2f;
+    public GameObject judgementPrefab;
 
     void Start()
     {
@@ -45,6 +48,11 @@ public class TargetCircle : MonoBehaviour
         timer = updateInterval;
         circleTransparency = 0f;
         spriteRenderer.color = new Color(1f, 1f, 1f, circleTransparency);
+    }
+
+    void Awake()
+    {
+        Instance = this;
     }
 
     public void Initialize(Vector2 position, float angle, int lifeSpan, float size, int matchFrame, bool shrinkingWhiteCircle)
@@ -93,82 +101,138 @@ public class TargetCircle : MonoBehaviour
     }
 
     void Update()
-{
-    if (TargetCircleManager.Instance.pausedGame) return;
-
-    timer -= Time.deltaTime;
-    if (timer <= 0f)
     {
-        circleLifeSpan++;
-        if (circleLifeSpan <= 5)
-        {
-            circleTransparency += 1f / 5f;
-            circleTransparency = Mathf.Clamp(circleTransparency, 0f, 1f);
-            spriteRenderer.color = new Color(1f, 1f, 1f, circleTransparency);
-        }
-        else if (circleLifeSpan >= maxLifeSpan - 3 && circleLifeSpan <= maxLifeSpan)
-        {
-            circleTransparency -= 1f / 3f;
-            circleTransparency = Mathf.Clamp(circleTransparency, 0f, 1f);
-            spriteRenderer.color = new Color(1f, 1f, 1f, circleTransparency);
-        }
-        if (circleLifeSpan >= maxLifeSpan)
-        {
-            Destroy(gameObject);
-            Debug.Log("Despawned.");
-            scoreMultiplier = 1;
-        }
-        Debug.Log(matchFrame - circleLifeSpan);
+        if (TargetCircleManager.Instance.pausedGame) return;
 
-        if (matchFrame == circleLifeSpan && isShrinkingWhiteCircle == false)
+        timer -= Time.deltaTime;
+        if (timer <= 0f)
         {
-            shrinkingCircle.SetActive(true);
-        }
-        else if (isShrinkingWhiteCircle == true)
-        {
-            if (matchFrame - circleLifeSpan == 19)
+            circleLifeSpan++;
+            if (circleLifeSpan <= 5)
+            {
+                circleTransparency += 1f / 5f;
+                circleTransparency = Mathf.Clamp(circleTransparency, 0f, 1f);
+                spriteRenderer.color = new Color(1f, 1f, 1f, circleTransparency);
+            }
+            else if (circleLifeSpan >= maxLifeSpan - 3 && circleLifeSpan <= maxLifeSpan)
+            {
+                circleTransparency -= 1f / 3f;
+                circleTransparency = Mathf.Clamp(circleTransparency, 0f, 1f);
+                spriteRenderer.color = new Color(1f, 1f, 1f, circleTransparency);
+            }
+            if (circleLifeSpan >= maxLifeSpan)
+            {
+
+                Debug.Log("Despawned.");
+                string judgementState = "Miss"; 
+                HealthManager.Instance.UpdateHealth(-10f); 
+                GameObject judgementObject = Instantiate(judgementPrefab, transform.position, Quaternion.identity);
+                JudgementManager judgementManager = judgementObject.GetComponent<JudgementManager>();
+                if (judgementManager != null)
+                {
+                    judgementManager.Initialize(transform.position, judgementState);
+                }
+                else
+                {
+                    Debug.LogError("JudgementManager component not found on the instantiated prefab.");
+                }
+                scoreMultiplier = 1;
+                Destroy(gameObject);
+            }
+            if (matchFrame == circleLifeSpan && !isShrinkingWhiteCircle)
             {
                 shrinkingCircle.SetActive(true);
-                shrinkingCircle.transform.localScale = new Vector2(0.2f, 0.2f);
             }
-            if (matchFrame - circleLifeSpan > 0 && matchFrame - circleLifeSpan <= 21)
+            else if (isShrinkingWhiteCircle)
             {
-                targetCircleWhite = targetCircleWhite - 0.00701754385f;
-                shrinkingCircle.transform.localScale = new Vector2((float)targetCircleWhite, (float)targetCircleWhite);
+                if (matchFrame - circleLifeSpan == 19)
+                {
+                    shrinkingCircle.SetActive(true);
+                    shrinkingCircle.transform.localScale = new Vector2(0.2f, 0.2f);
+                }
+                if (matchFrame - circleLifeSpan > 0 && matchFrame - circleLifeSpan <= 21)
+                {
+                    targetCircleWhite -= 0.00701754385f;
+                    shrinkingCircle.transform.localScale = new Vector2(targetCircleWhite, targetCircleWhite);
+                }
             }
-        }
 
-        timer = updateInterval;
+            timer = updateInterval;
+        }
     }
-}
 
     private void CalculateScore()
     {
-        int frameDifference = Mathf.Abs(circleLifeSpan - matchFrame);
+        int frameDifference = circleLifeSpan - matchFrame; 
+        int windowSize = isShrinkingWhiteCircle ? 3 : 5; 
+        string judgementState = "Bad"; 
+        Debug.Log(frameDifference);
 
-        if (frameDifference <= 5)
+        if (frameDifference <= -8) 
+{
+    Debug.Log("Bad");
+    ScoreManager.Instance.AddScore(100 * scoreMultiplier);
+    HealthManager.Instance.UpdateHealth(-6f); 
+    scoreMultiplier = 1;
+    judgementState = "Bad";
+}
+else if (frameDifference <= -5) 
+{
+    Debug.Log("Okay");
+    ScoreManager.Instance.AddScore(100 * scoreMultiplier);
+    scoreMultiplier = 1;
+    judgementState = "Okay";
+}
+else if (frameDifference <= -3) 
+{
+    Debug.Log("Good");
+    ScoreManager.Instance.AddScore(100 * scoreMultiplier);
+    HealthManager.Instance.UpdateHealth(5f); 
+    scoreMultiplier = 1;
+    judgementState = "Good";
+}
+else if (Mathf.Abs(frameDifference) <= windowSize) 
+{
+    Debug.Log("Perfect");
+    ScoreManager.Instance.AddScore(500 * scoreMultiplier);
+    scoreMultiplier = Mathf.Min(scoreMultiplier + 0.5f, 8);
+    HealthManager.Instance.UpdateHealth(7f); 
+    judgementState = "Perfect";
+}
+else if (Mathf.Abs(frameDifference) <= windowSize + 5) 
+{
+    Debug.Log("Good");
+    ScoreManager.Instance.AddScore(300 * scoreMultiplier);
+    scoreMultiplier = Mathf.Min(scoreMultiplier + 0.5f, 8);
+    HealthManager.Instance.UpdateHealth(5f); 
+    judgementState = "Good";
+}
+else if (Mathf.Abs(frameDifference) <= windowSize + 8)
+{
+    Debug.Log("Okay");
+    ScoreManager.Instance.AddScore(200 * scoreMultiplier);
+    scoreMultiplier = Mathf.Min(scoreMultiplier + 0.5f, 8);
+    judgementState = "Okay";
+}
+else
+{
+    Debug.Log("Bad");
+    ScoreManager.Instance.AddScore(100 * scoreMultiplier);
+    HealthManager.Instance.UpdateHealth(-6f); 
+    scoreMultiplier = 1;
+    judgementState = "Bad";
+}
+
+        // Instantiate the judgementPrefab and initialize it
+        GameObject judgementObject = Instantiate(judgementPrefab, transform.position, Quaternion.identity);
+        JudgementManager judgementManager = judgementObject.GetComponent<JudgementManager>();
+        if (judgementManager != null)
         {
-            Debug.Log("Perfect");
-            ScoreManager.Instance.AddScore(500 * scoreMultiplier);
-            scoreMultiplier = Mathf.Min(scoreMultiplier + 0.5f, 8);
-        }
-        else if (frameDifference <= 7)
-        {
-            Debug.Log("Good");
-            ScoreManager.Instance.AddScore(300 * scoreMultiplier);
-            scoreMultiplier = Mathf.Min(scoreMultiplier + 0.5f, 8);
-        }
-        else if (frameDifference <= 10)
-        {
-            Debug.Log("Okay");
-            ScoreManager.Instance.AddScore(200 * scoreMultiplier);
-            scoreMultiplier = Mathf.Min(scoreMultiplier + 0.5f, 8);
+            judgementManager.Initialize(transform.position, judgementState);
         }
         else
         {
-            Debug.Log("Bad");
-            ScoreManager.Instance.AddScore(100 * scoreMultiplier);
-            scoreMultiplier = 1;
+            Debug.LogError("JudgementManager component not found on the instantiated prefab.");
         }
     }
 }
